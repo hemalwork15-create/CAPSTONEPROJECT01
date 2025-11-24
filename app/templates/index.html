@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EduDocs Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f7f9;
+        }
+
+        header {
+            background-color: #2b7a78;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 80px);
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #17252a;
+        }
+
+        input[type="text"], input[type="number"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3aafa9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2b7a78;
+        }
+
+        .message {
+            text-align: center;
+            color: green;
+            margin-bottom: 10px;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #17252a;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>EduDocs - Document Manager</h1>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Upload Document</h2>
+            {% if message %}
+            <div class="message">{{ message }}</div>
+            {% endif %}
+            <form action="/upload/" method="post" enctype="multipart/form-data">
+                <input type="text" name="title" placeholder="Document Title" required>
+                <input type="number" name="category_id" placeholder="Category ID" required>
+                <input type="number" name="uploader_id" placeholder="Uploader ID" required>
+                <input type="file" name="file" required>
+                <button type="submit">Upload</button>
+            </form>
+            <a href="/documents/">View All Documents</a>
+        </div>
+    </div>
+</body>
+</html>
