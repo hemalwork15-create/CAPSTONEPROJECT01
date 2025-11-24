@@ -64,18 +64,18 @@ jobs:
 
       - name: Run app container
         run: |
-          # Map container port 8000 to host port 8000
+          # Run container, map container port 8000 to host 8000
           docker run -d --name calc-ci -p 8000:8000 calculator:ci
           sleep 10  # wait for FastAPI to start
 
-      - name: Check if app is running
+      - name: Health check inside container
         run: |
           for i in {1..20}; do
-            if curl -sSf http://localhost:8000/ >/dev/null; then
+            if docker exec calc-ci curl -sSf http://127.0.0.1:8000/ >/dev/null; then
               echo "App is UP"
               exit 0
             fi
-            echo "Waiting for app..."
+            echo "Waiting for app inside container..."
             sleep 3
           done
           echo "App did NOT start"
