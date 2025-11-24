@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EduDocs List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f7f9;
+        }
+
+        header {
+            background-color: #2b7a78;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #17252a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3aafa9;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        a.button {
+            display: inline-block;
+            padding: 8px 12px;
+            background-color: #3aafa9;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        a.button:hover {
+            background-color: #2b7a78;
+        }
+
+        .top-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>EduDocs - Documents</h1>
+    </header>
+
+    <div class="container">
+        <h2>Uploaded Documents</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Category ID</th>
+                <th>Uploader ID</th>
+                <th>File</th>
+            </tr>
+            {% for doc in documents %}
+            <tr>
+                <td>{{ doc.id }}</td>
+                <td>{{ doc.title }}</td>
+                <td>{{ doc.category_id }}</td>
+                <td>{{ doc.uploader_id }}</td>
+                <td><a class="button" href="/download/{{ doc.id }}">Download</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div class="top-link">
+            <a href="/">Upload New Document</a>
+        </div>
+    </div>
+</body>
+</html>
