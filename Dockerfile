@@ -1,19 +1,17 @@
-# Use Python 3.11
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the app code
+# Copy app folder and main.py
 COPY ./app ./app
+COPY ./main.py .
 
-# Create uploads folder
 RUN mkdir -p /app/static/uploads
 
 EXPOSE 8000
 
 # Start FastAPI
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
