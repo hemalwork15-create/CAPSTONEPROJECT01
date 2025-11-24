@@ -1,19 +1,33 @@
-# Dockerfile
-FROM python:3.11-slim
+version: "3.9"
 
-WORKDIR /app
+services:
+  db:
+    image: mysql:8.0
+    container_name: edudocs-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: edudocs
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 5
+      timeout: 5s
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy app code
-COPY ./app ./app
-
-# Create uploads folder
-RUN mkdir -p /app/static/uploads
-
-EXPOSE 8000
-
-# Run FastAPI app
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+  app:
+    build: .
+    container_name: edudocs-app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DB: edudocs
