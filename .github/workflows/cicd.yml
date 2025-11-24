@@ -58,19 +58,21 @@ jobs:
       - name: Run app container (FastAPI)
         run: |
           docker run -d --name edudocs-ci -p 8000:8000 edudocs-ci
-          sleep 5
+          sleep 10  # increased wait to allow app to start
 
       - name: Health check
         run: |
-          for i in {1..10}; do
+          for i in {1..20}; do
             if curl -sSf http://localhost:8000/docs >/dev/null; then
               echo "App is UP"
               exit 0
             fi
             echo "Waiting for app..."
-            sleep 2
+            sleep 3
           done
           echo "App did NOT start"
+          echo "Container logs:"
+          docker logs edudocs-ci
           exit 1
 
       - name: OWASP ZAP Baseline Scan
