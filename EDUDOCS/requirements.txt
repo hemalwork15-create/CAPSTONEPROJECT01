@@ -1,8 +1,0 @@
-fastapi
-uvicorn
-sqlalchemy
-mysql-connector-python
-pydantic
-python-multipart
-pytest-bdd
-requests
