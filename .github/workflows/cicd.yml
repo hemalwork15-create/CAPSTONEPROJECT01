@@ -10,7 +10,7 @@ on:
 jobs:
 
   # ===============================
-  # SAST: Bandit + Semgrep (UNCHANGED)
+  # SAST: Bandit + Semgrep
   # ===============================
   sast:
     name: SAST (Bandit + Semgrep)
@@ -46,7 +46,6 @@ jobs:
         with:
           config: p/default
 
-
   # ===============================
   # Build Docker + DAST (OWASP ZAP)
   # ===============================
@@ -63,14 +62,13 @@ jobs:
         run: docker build -t calculator:ci .
 
       - name: Run app container
-        run: |
-          # Run container, map container port 8000 to host 8000
-          docker run -d --name calc-ci -p 8000:8000 calculator:ci
-          sleep 10  # wait for FastAPI to start
+        run: docker run -d --name calc-ci -p 8000:8000 calculator:ci
 
-      - name: Health check inside container
+      - name: Wait for app to start
         run: |
           for i in {1..20}; do
+            logs=$(docker logs calc-ci || true)
+            echo "$logs"
             if docker exec calc-ci curl -sSf http://127.0.0.1:8000/ >/dev/null; then
               echo "App is UP"
               exit 0
