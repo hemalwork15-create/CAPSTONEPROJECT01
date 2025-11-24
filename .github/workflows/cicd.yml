@@ -34,7 +34,8 @@ jobs:
     needs: sast
     steps:
       - uses: actions/checkout@v4
-      - run: docker-compose up -d --build
+      - run: docker compose up -d --build
+
       - name: Wait for app
         run: |
           for i in {1..15}; do
