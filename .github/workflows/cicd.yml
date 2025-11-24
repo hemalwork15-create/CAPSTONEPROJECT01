@@ -9,6 +9,7 @@ on:
 
 jobs:
 
+  # ========================= SAST =========================
   sast:
     name: SAST (Bandit + Semgrep)
     runs-on: ubuntu-latest
@@ -43,6 +44,7 @@ jobs:
         with:
           config: p/default
 
+  # ========================= Build + DAST =========================
   build-and-dast:
     name: Build Docker + Run DAST
     runs-on: ubuntu-latest
@@ -55,23 +57,20 @@ jobs:
       - name: Build Docker image
         run: docker build -t edudocs-ci .
 
-      - name: Run app container (FastAPI)
-        run: |
-          docker run -d --name edudocs-ci -p 8000:8000 edudocs-ci
-          sleep 10  # increased wait to allow app to start
+      - name: Run app container
+        run: docker run -d --name edudocs-ci -p 8000:8000 edudocs-ci
 
-      - name: Health check
+      - name: Wait for FastAPI to start
         run: |
           for i in {1..20}; do
-            if curl -sSf http://localhost:8000/docs >/dev/null; then
+            if docker exec edudocs-ci curl -sSf http://127.0.0.1:8000/docs >/dev/null; then
               echo "App is UP"
               exit 0
             fi
-            echo "Waiting for app..."
+            echo "Waiting for app inside container..."
             sleep 3
           done
           echo "App did NOT start"
-          echo "Container logs:"
           docker logs edudocs-ci
           exit 1
 
