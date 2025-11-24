@@ -28,7 +28,7 @@ jobs:
       - name: Install Bandit
         run: pip install bandit
 
-      - name: Run Bandit 
+      - name: Run Bandit
         run: bandit -r . -f json -o bandit-report.json --exit-zero
 
       - name: Upload Bandit Report
@@ -43,7 +43,6 @@ jobs:
         with:
           config: p/default
 
-
   build-and-dast:
     name: Build Docker + Run DAST
     runs-on: ubuntu-latest
@@ -54,11 +53,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t documagic:ci .
+        run: docker build -t edudocs-ci .
 
       - name: Run app container (FastAPI)
         run: |
-          docker run -d --name docu-ci -p 8000:8000 documagic:ci
+          docker run -d --name edudocs-ci -p 8000:8000 edudocs-ci
           sleep 5
 
       - name: Health check
@@ -82,8 +81,14 @@ jobs:
           allow_issue_writing: false
           cmd_options: "-a"
 
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report
+          path: owasp-zap-report.html
+
       - name: Cleanup
         if: always()
         run: |
-          docker stop docu-ci || true
-          docker rm docu-ci || true
+          docker stop edudocs-ci || true
+          docker rm edudocs-ci || true
