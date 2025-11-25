@@ -17,20 +17,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - run: pip install -r requirements.txt
       - run: pip install bandit
       - run: bandit -r . -f json -o bandit-report.json --exit-zero
+
       - uses: actions/upload-artifact@v4
         with:
           name: bandit-report
           path: bandit-report.json
+
       - uses: returntocorp/semgrep-action@v1
         continue-on-error: true
         with:
           config: p/default
+
 
   # ===============================
   # Build Docker + DAST
@@ -42,26 +47,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Build and start containers
-      - name: Start app and DB
-        run: docker compose up -d --build
+      # Build Docker image
+      - name: Build Docker image
+        run: docker build -t edudocs-app:ci .
 
-      # Wait for FastAPI to be ready
-      - name: Wait for app
+      # Run container
+      - name: Run app container
+        run: |
+          docker run -d --name edudocs-ci -p 8000:8000 edudocs-app:ci
+          sleep 10
+
+      # Health check - wait for app
+      - name: Wait for FastAPI to be ready
         run: |
           for i in {1..15}; do
-            if docker exec edudocs-app curl -sSf http://localhost:8000/docs >/dev/null; then
-              echo "App is UP"
+            if curl -sSf http://localhost:8000/docs >/dev/null; then
+              echo "APP IS UP"
               exit 0
             fi
-            echo "Waiting for app..."
+            echo "Waiting for FastAPI..."
             sleep 5
           done
-          echo "App did NOT start"
+          echo "App failed to start"
           exit 1
 
       # Run OWASP ZAP Baseline Scan
-      - uses: zaproxy/action-baseline@v0.14.0
+      - name: Run OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
         with:
           target: "http://localhost:8000"
           fail_action: false
@@ -74,5 +86,6 @@ jobs:
           name: zap-report
           path: owasp-zap-report.html
 
-      # Cleanup containers
-      - run: docker compose down
+      # Cleanup
+      - name: Stop container
+        run: docker rm -f edudocs-ci
